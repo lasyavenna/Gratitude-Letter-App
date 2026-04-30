@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./App.css";
+import { jsPDF } from "jspdf";
 
 export default function App() {
   const [form, setForm] = useState({
@@ -51,6 +52,38 @@ export default function App() {
     fetchLetters();
   };
 
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    const margin = 20;
+    const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
+
+    // strip markdown
+    const cleanLetter = letter
+      .replace(/^#+\s*/gm, "")
+      .replace(/\*\*(.*?)\*\*/g, "$1")
+      .replace(/\*(.*?)\*/g, "$1")
+      .trim();
+
+    doc.setFont("times", "normal");
+    doc.setFontSize(22);
+    doc.setTextColor(192, 97, 74);
+    doc.text("A Letter of Gratitude", margin, 30);
+
+    doc.setFontSize(11);
+    doc.setTextColor(100, 80, 70);
+    doc.text(`To: ${form.recipient_name}   |   From: ${form.your_name}`, margin, 42);
+
+    doc.setDrawColor(212, 184, 168);
+    doc.line(margin, 47, margin + pageWidth, 47);
+
+    doc.setFontSize(12);
+    doc.setTextColor(58, 42, 30);
+    const lines = doc.splitTextToSize(cleanLetter, pageWidth);
+    doc.text(lines, margin, 58);
+
+    doc.save(`letter-to-${form.recipient_name}.pdf`);
+  };
+
   return (
     <div className="app">
       <h1>💌 Gratitude Letter Generator</h1>
@@ -88,6 +121,7 @@ export default function App() {
           <p>{letter}</p>
           <div className="letter-actions">
             <button onClick={() => navigator.clipboard.writeText(letter)}>📋 Copy</button>
+            <button onClick={handleDownloadPDF}>📄 Download PDF</button>
             <button onClick={handleSave} disabled={saved} className="save-btn">
               {saved ? "✅ Saved!" : "💾 Save Letter"}
             </button>

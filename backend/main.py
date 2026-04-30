@@ -61,6 +61,7 @@ Write a warm, genuine letter (3-4 paragraphs) that:
 - Expresses deep, authentic gratitude
 - Closes with a heartfelt sign-off
 
+Do not use any markdown formatting. Write in plain text only.
 Do not include any preamble, just write the letter directly."""
 
     def stream():
